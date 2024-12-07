@@ -11,6 +11,7 @@ const socketIo = require('socket.io');
 const socketAuth = require("./utils/socketMiddelware");
 const { init } = require('./utils/socketInit');
 const { handleSendMessage } = require('./controllers/messageController');
+const swaggerDocs = require("./swagger");
 
 
 app.use(bodyParser.json());
@@ -44,4 +45,12 @@ app.use('/auth' ,authRoutes)
 app.use('/users' ,userRoutes)
 app.use("/chats" ,chatRoomsRoutes)
 const PORT =  8000;
-server.listen(PORT,() => console.log(`Server running on port ${PORT}`));
+server.listen(
+    PORT ,() => {
+        console.log('Server running on port 8000') ;
+        swaggerDocs(app, PORT)
+
+
+}
+
+);
