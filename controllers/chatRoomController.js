@@ -35,7 +35,6 @@ exports.getMyChatRooms = async (req, res) => {
     }
 };
 
-
 exports.joinRoom = async (req, res) => {
     try {
         const { token } = req.body;
