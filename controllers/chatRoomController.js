@@ -20,7 +20,6 @@ exports.createRoom =async(req, res) => {
     }
 }
 
-
 exports.getMyChatRooms = async (req, res) => {
     try {
         const userChatRooms = await ChatRoomUser.find({ userId : req.user.id} ).select('chatRoomId');

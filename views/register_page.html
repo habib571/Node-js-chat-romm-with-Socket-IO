@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Register - Chat App</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@4.5.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <style>
+    body {
+      background-color: #f4f7f6;
+      margin-top: 20px;
+    }
+    .auth-card {
+      background: #fff;
+      padding: 30px;
+      border-radius: .55rem;
+      box-shadow: 0 1px 2px 0 rgb(0 0 0 / 10%);
+      max-width: 400px;
+      margin: auto;
+    }
+    .auth-card h3 {
+      text-align: center;
+      margin-bottom: 20px;
+      color: #444;
+    }
+    .btn-auth {
+      background: #1d8ecd;
+      color: #fff;
+      border: none;
+    }
+    .btn-auth:hover {
+      background: #155b7f;
+    }
+    .auth-footer {
+      text-align: center;
+      margin-top: 15px;
+    }
+    .auth-footer a {
+      color: #1d8ecd;
+      text-decoration: none;
+    }
+    .auth-footer a:hover {
+      text-decoration: underline;
+    }
+    #registerMessage {
+      margin-top: 15px;
+      text-align: center;
+    }
+  </style>
+</head>
+<body>
+<div class="container">
+  <div class="auth-card">
+    <h3>Create an Account</h3>
+    <form id="registerForm">
+      <div class="form-group">
+        <label for="name">Full Name</label>
+        <input type="text" class="form-control" id="registerName" placeholder="Enter your full name">
+      </div>
+      <div class="form-group">
+        <label for="email">Email Address</label>
+        <input type="email" class="form-control" id="registerEmail" placeholder="Enter your email">
+      </div>
+      <div class="form-group">
+        <label for="password">Password</label>
+        <input type="password" class="form-control" id="registerPassword" placeholder="Enter your password">
+      </div>
+      <button type="submit" class="btn btn-auth btn-block mt-3">Register</button>
+    </form>
+    <div id="registerMessage" class="text-danger"></div>
+    <div class="auth-footer">
+      <a href="chat_page.html">Already have an account? Login</a>
+    </div>
+  </div>
+</div>
+
+<script src="https://code.jquery.com/jquery-1.10.2.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@4.5.0/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+  // API URL
+  const API_URL = "http://localhost:8000/auth/register";
+
+  // Handle registration form submission
+  document.getElementById("registerForm").addEventListener("submit", async (event) => {
+    event.preventDefault();
+
+    const registerMessage = document.getElementById("registerMessage");
+    registerMessage.textContent = "";
+
+    const name = document.getElementById("registerName").value;
+    const email = document.getElementById("registerEmail").value;
+    const password = document.getElementById("registerPassword").value;
+
+    try {
+      const response = await fetch(API_URL, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ name, email, password }),
+      });
+
+      const data = await response.json();
+
+      if (response.ok) {
+      /*  registerMessage.textContent = "Registration successful! Please log in.";
+        registerMessage.classList.remove("text-danger");
+        registerMessage.classList.add("text-success");
+        document.getElementById("registerForm").reset();*/
+        localStorage.setItem("authToken", data.data.token);
+        console.log(data.data.token);
+        setTimeout(() => {
+          window.location.href = "room_list.html";
+        }, 500);
+      } else {
+        registerMessage.textContent = data.message || "Registration failed. Please try again.";
+      }
+    } catch (error) {
+      registerMessage.textContent = "Error: Could not connect to the server.";
+    }
+  });
+</script>
+</body>
+</html>
