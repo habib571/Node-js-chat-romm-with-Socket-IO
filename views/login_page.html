@@ -42,20 +42,26 @@
     .auth-footer a:hover {
       text-decoration: underline;
     }
+    .text-danger {
+      color: red;
+    }
+    .text-success {
+      color: green;
+    }
   </style>
 </head>
 <body>
 <div class="container">
   <div class="auth-card">
     <h3>Login to Chat</h3>
-    <form>
+    <form id="loginForm">
       <div class="form-group">
         <label for="email">Email Address</label>
-        <input type="email" class="form-control" id="email" placeholder="Enter your email">
+        <input type="email" class="form-control" id="email" placeholder="Enter your email" required>
       </div>
       <div class="form-group">
         <label for="password">Password</label>
-        <input type="password" class="form-control" id="password" placeholder="Enter your password">
+        <input type="password" class="form-control" id="password" placeholder="Enter your password" required>
       </div>
       <div class="form-check">
         <input type="checkbox" class="form-check-input" id="rememberMe">
@@ -63,12 +69,59 @@
       </div>
       <button type="submit" class="btn btn-auth btn-block mt-3">Login</button>
     </form>
+    <div id="message" class="text-center mt-3"></div>
     <div class="auth-footer">
       <a href="#">Forgot Password?</a><br>
       <a href="register_page.html">Don't have an account? Register</a>
     </div>
   </div>
 </div>
+<script>
+  const API_URL = "http://localhost:8000/auth/login"; // Replace with your API endpoint
+
+  document.getElementById("loginForm").addEventListener("submit", async function (event) {
+    event.preventDefault();
+
+    const email = document.getElementById("email").value;
+    const password = document.getElementById("password").value;
+    const message = document.getElementById("message");
+
+    try {
+      const response = await fetch(API_URL, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ email, password }),
+      });
+
+      const data = await response.json();
+
+      if (response.ok) {
+        message.textContent = "Login successful!";
+        message.classList.remove("text-danger");
+        message.classList.add("text-success");
+
+        // Save token to localStorage
+        localStorage.setItem("authToken", data.data.token);
+
+        // Redirect to chat page
+        setTimeout(() => {
+          window.location.href = "room_list.html";
+        },100);
+      } else {
+        message.textContent = data.message || "Login failed. Please try again.";
+        message.classList.remove("text-success");
+        message.classList.add("text-danger");
+      }
+    } catch (error) {
+      console.error("Error:", error);
+      message.textContent = "Error: Could not connect to the server.";
+      message.classList.remove("text-success");
+      message.classList.add("text-danger");
+    }
+  });
+</script>
 <script src="https://code.jquery.com/jquery-1.10.2.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.5.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>

@@ -13,7 +13,7 @@ exports.register = async(req,res) => {
              return customResponse(res,400 ,"user already exist" ,null )
          }
           await user.save() ;
-         const token = jwt.sign({ id: user.id , email : email }, 'secret');
+         const token = jwt.sign({ id: user._id , email : email }, 'secret');
          return  customResponse(res,200 ,"user registered successfully" , {
                token ,
                user : user

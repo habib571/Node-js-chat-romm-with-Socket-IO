@@ -7,7 +7,7 @@ exports.createRoom =async(req, res) => {
     try {
         const { name , imageUrl} = req.body ;
         const chatRoom = new ChatRoom({name,token: chatRoomToken ,imageUrl , adminId :req.user.id})
-        console.log(req.user.id) ;
+         console.log(req.user.id) ;
          await chatRoom.save() ;
          const chatRoomUser  = await  new ChatRoomUser( { chatRoomId :chatRoom._id ,  userId : req.user.id, isAdmin :true}) ;
          await  chatRoomUser.save() ;
@@ -23,6 +23,7 @@ exports.createRoom =async(req, res) => {
 exports.getMyChatRooms = async (req, res) => {
     try {
         const userChatRooms = await ChatRoomUser.find({ userId : req.user.id} ).select('chatRoomId');
+        console.log(req.user.id)
         const chatRoomIds = userChatRooms.map((chatUser) => chatUser.chatRoomId);
         const joinedChatRooms = await ChatRoom.find({ _id: { $in: chatRoomIds } });
 

@@ -1,104 +1,119 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="utf-8">
-    <title>Chat Rooms - Bootdey.com</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@4.5.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet" />
-    <style>
-        body {
-            background-color: #f4f7f6;
-            margin-top: 20px;
-        }
-        .card {
-            background: #fff;
-            border: 0;
-            margin-bottom: 30px;
-            border-radius: .55rem;
-            box-shadow: 0 1px 2px 0 rgb(0 0 0 / 10%);
-        }
-        .people-list {
-            padding: 20px;
-            background: #fff;
-            border-radius: 8px;
-        }
-        .people-list .chat-list li {
-            padding: 10px 15px;
-            list-style: none;
-            border-radius: 3px;
-        }
-        .people-list .chat-list li:hover {
-            background: #efefef;
-            cursor: pointer;
-        }
-        .people-list .chat-list li .name {
-            font-size: 15px;
-        }
-    </style>
-</head>
-<body>
-<div class="container">
-    <div class="row">
-        <div class="col-lg-12">
-            <div class="card people-list">
-                <h5 class="text-center mb-3">Chat Rooms</h5>
-                <div class="input-group mb-3">
-                    <div class="input-group-prepend">
-                        <span class="input-group-text"><i class="fa fa-search"></i></span>
+    <!DOCTYPE html>
+    <html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <title>Chat Rooms - Bootdey.com</title>
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <link href="https://cdn.jsdelivr.net/npm/bootstrap@4.5.0/dist/css/bootstrap.min.css" rel="stylesheet">
+        <link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet" />
+        <style>
+            body {
+                background-color: #f4f7f6;
+                margin-top: 20px;
+            }
+            .card {
+                background: #fff;
+                border: 0;
+                margin-bottom: 30px;
+                border-radius: .55rem;
+                box-shadow: 0 1px 2px 0 rgb(0 0 0 / 10%);
+            }
+            .people-list {
+                padding: 20px;
+                background: #fff;
+                border-radius: 8px;
+            }
+            .people-list .chat-list li {
+                padding: 10px 15px;
+                list-style: none;
+                border-radius: 3px;
+            }
+            .people-list .chat-list li:hover {
+                background: #efefef;
+                cursor: pointer;
+            }
+            .people-list .chat-list li .name {
+                font-size: 15px;
+            }
+        </style>
+    </head>
+    <body>
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-12">
+                <div class="card people-list">
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <h5 class="m-0">Chat Rooms</h5>
+                        <button id="add-room-btn" class="btn btn-primary btn-sm">Add Room</button>
                     </div>
-                    <input type="text" class="form-control" placeholder="Search...">
+                    <div class="input-group mb-3">
+                        <div class="input-group-prepend">
+                            <span class="input-group-text"><i class="fa fa-search"></i></span>
+                        </div>
+                        <input type="text" class="form-control" placeholder="Search...">
+                    </div>
+                    <ul class="list-unstyled chat-list mt-2 mb-0">
+                        <!-- Chat rooms will be dynamically added here -->
+                    </ul>
+                    <p id="no-rooms-text" class="text-center text-muted mt-3 d-none">No rooms available</p>
                 </div>
-                <ul class="list-unstyled chat-list mt-2 mb-0">
-                </ul>
-                <p id="no-rooms-text" class="text-center text-muted mt-3 d-none">No rooms available</p>
             </div>
         </div>
     </div>
-</div>
+    <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.5.0/dist/js/bootstrap.min.js"></script>
+    <script>
+        $(document).ready(function () {
+            function loadChatRooms() {
+                const API_URL = "http://localhost:8000/chats/get-my-rooms";
 
-<script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@4.5.0/dist/js/bootstrap.min.js"></script>
-<script>
-    $(document).ready(function() {
-        function loadChatRooms() {
-            const token = localStorage.getItem('authToken');
-            const API_URL = "http://localhost:8000/chats/get-my-rooms";
+                console.log("Fetching rooms...");
+                $.ajax({
+                    url: API_URL,
+                    type: "GET",
+                    headers: {
+                        "Content-Type": "application/json",
+                        Authorization: `Bearer ${localStorage.getItem("authToken")}`,
+                    },
+                    success: function (response) {
+                        console.log("API Response:", response);
+                        const rooms = response.data;
+                        const chatRoomHtml = [];
+                        if (rooms && rooms.length > 0) {
+                            rooms.forEach(function (room) {
+                                chatRoomHtml.push(`
+                            <li class="clearfix">
+                                <div class="about d-flex align-items-center">
+                 <img src="${room.imageUrl || 'https://via.placeholder.com/50/007bff/ffffff?text=Chat'}" class="rounded-circle mr-3" alt="Chat Group Image">
 
-            $.ajax({
-                url: API_URL,
-                type: 'GET',
-                headers: {
-                    "Content-Type": "application/json",
-                    'Authorization': 'Bearer ' + token
-                },
-                success: function(rooms) {
-                    const chatRoomHtml = [];
-                    if (rooms.length > 0) {
-                        rooms.forEach(function(room) {
-                            chatRoomHtml.push(`
-                                <li class="clearfix ${room.isActive ? 'active' : ''}">
-                                    <div class="about">
-                                        <div class="name">${room.name}</div>
-                                    </div>
-                                </li>
-                            `);
-                        });
-                        $('#no-rooms-text').addClass('d-none');
-                    } else {
-                        $('#no-rooms-text').removeClass('d-none');
-                    }
-                    $('.chat-list').html(chatRoomHtml.join(''));
-                },
-                error: function() {
-                    $('#no-rooms-text').removeClass('d-none').text("Failed to load rooms.");
-                }
+
+                                    <div class="name">${room.name}</div>
+                                </div>
+                            </li>
+                        `);
+                            });
+                            $('#no-rooms-text').addClass('d-none');
+                        } else {
+                            $('#no-rooms-text').removeClass('d-none').text("No rooms available");
+                        }
+                        $('.chat-list').html(chatRoomHtml.join(''));
+                    },
+                    error: function (xhr, status, error) {
+                        console.error("Error:", error, "Status:", status, "XHR:", xhr);
+                        $('#no-rooms-text').removeClass('d-none').text("Failed to load rooms.");
+                    },
+                });
+            }
+
+            $('#add-room-btn').click(function () {
+                window.location.href = 'create_chat.html'; // Redirects to create chat page
             });
-        }
 
-        // Load chat rooms on page load
-        loadChatRooms();
-    });
-</script>
-</body>
-</html>
+            // Load chat rooms on page load
+            loadChatRooms();
+        });
+
+
+    </script>
+    </body>
+    </html>

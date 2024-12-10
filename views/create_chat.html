@@ -50,21 +50,34 @@
 <div class="container">
     <div class="create-chat-card">
         <h3>Create a Chat Room</h3>
-        <div class="text-center">
-            <img src="https://bootdey.com/img/Content/avatar/avatar1.png" alt="avatar" style="width: 100px; height: 100px; border-radius: 50%;">
+        <div class="text-center mb-3">
+            <img src="https://bootdey.com/img/Content/avatar/avatar1.png"
+                 alt="Chat Room Avatar"
+                 style="width: 100px; height: 100px; border-radius: 50%;">
         </div>
         <form id="createChatForm">
             <div class="form-group">
-                <input type="text" class="form-control" id="chatName" placeholder="Enter chat room name">
+                <input type="text"
+                       class="form-control"
+                       id="chatName"
+                       placeholder="Enter chat room name"
+                       aria-label="Chat Room Name"
+                       required>
             </div>
-
-            <button type="submit" class="btn btn-create btn-block mt-3">Create Room</button>
+            <button type="submit"
+                    class="btn btn-create btn-block mt-3">
+                Create Room
+            </button>
         </form>
+        <div id="statusMessage" class="text-center mt-3 text-danger">
+            <!-- Error or success messages will appear here -->
+        </div>
         <div class="auth-footer text-center mt-3">
-            <a href="chat_page.html">Back to Chat</a>
+            <a href="room_list.html" class="btn btn-secondary">Back to Chat</a>
         </div>
     </div>
 </div>
+
 
 <script src="https://code.jquery.com/jquery-1.10.2.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.5.0/dist/js/bootstrap.bundle.min.js"></script>
@@ -72,26 +85,24 @@
     // API URL
     const API_URL = "http://localhost:8000/chats/create-room";
 
-    // Function to handle chat room creation
-    async function handleCreateChat(formId, messageId) {
-        const form = document.getElementById(formId);
-        const message = document.getElementById(messageId);
+    async function handleCreateChat() {
+        const form = document.getElementById("createChatForm");
+        const message = document.getElementById("statusMessage");
 
         form.addEventListener("submit", async (event) => {
             event.preventDefault();
             message.textContent = "";
 
-            // Collect form data
-            const chatName = form.querySelector("#chatName").value;
+            const chatName = document.getElementById("chatName").value;
 
             try {
                 const response = await fetch(API_URL, {
                     method: "POST",
                     headers: {
                         "Content-Type": "application/json",
-                        "Authorization": `Bearer ${localStorage.getItem("authToken")}`
+                        "Authorization": `Bearer ${localStorage.getItem("authToken")}`,
                     },
-                    body: JSON.stringify({ name: chatName ,imageUrl : "" })
+                    body: JSON.stringify({ name: chatName, imageUrl: "" }),
                 });
 
                 const data = await response.json();
@@ -101,19 +112,20 @@
                     message.classList.remove("text-danger");
                     message.classList.add("text-success");
                     setTimeout(() => {
-                        window.location.href = "chat_page.html";
+                        window.location.href = "room_list.html.html";
                     }, 2000);
                 } else {
                     message.textContent = data.message || "Failed to create chat room. Please try again.";
                 }
             } catch (error) {
+                console.error("Error:", error);
                 message.textContent = "Error: Could not connect to the server.";
             }
         });
     }
 
-    // Attach event listeners to the form
-    handleCreateChat("createChatForm", "createChatMessage");
+    // Initialize form handling
+    handleCreateChat();
 </script>
 </body>
 </html>
